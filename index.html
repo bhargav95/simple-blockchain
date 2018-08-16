@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Blockchain Example</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <style>
+        .red {
+            background-color: lightcoral;
+        }
+
+        .blue {
+            background-color: aquamarine;
+        }
+    </style>
+</head>
+
+<body ng-app="blockchainApp" ng-controller="blockchainController">
+    <button class="btn btn-primary m-4" type="button" ng-click="addblock()">Add Block</button>
+    <div class="row">
+        <div class="border border-dark col-md-3 p-3 m-3" ng-repeat="block in blocks" ng-class='{red: checkhash(findhash($index))==false, blue:checkhash(findhash($index))==true}'>
+            <h4>Block {{$index}}</h4>
+            <label>Nonce</label>
+            <input class="form-control" type="number" ng-model="block.nonce">
+            <label>Message</label>
+            <input class="form-control" type="text" ng-model="block.message">
+            <label>Prev</label>
+            <input class="form-control" type="text" value="{{findhash($index-1)}}" disabled>
+            <label>Hash</label>
+            <input class="form-control" type="text" value="{{findhash($index)}}" disabled>
+            <br>
+            <button class="btn btn-primary mt-4" type="button" ng-click="mine($index)">Mine</button>
+            <button class="btn btn-danger mt-4" type="button" ng-click="removeblock($index)">Remove Block</button>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>
+    <script src="./sha256.js"></script>
+    <script>
+        angular.module('blockchainApp', [])
+            .controller('blockchainController', function($scope) {
+                $scope.blocks = [{
+                    "nonce": "",
+                    "message": "",
+                }];
+
+                $scope.findhash = function(index) {
+                    if (index < 0) {
+                        return "0".repeat(64);
+                    } else {
+                        return sha256($scope.blocks[index].nonce + $scope.blocks[index].message + $scope.findhash(index - 1));
+                    }
+                };
+
+                $scope.checkhash = function(str) {
+                    return str.substring(0, 4) === "0000";
+                };
+
+                $scope.mine = function(index) {
+                    $scope.blocks[index].nonce = 0;
+                    while (!$scope.checkhash($scope.findhash(index))) {
+                        $scope.blocks[index].nonce++;
+                    }
+                };
+
+                $scope.addblock = function(index) {
+                    $scope.blocks.push({
+                        "nonce": "",
+                        "message": "",
+                    });
+                };
+
+                $scope.removeblock = function(index) {
+                    $scope.blocks.splice(index, 1);
+                };
+            });
+    </script>
+</body>
+</html>
