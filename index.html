@@ -36,10 +36,18 @@
     </style>
 </head>
 
-<body ng-app="blockchainApp" ng-controller="blockchainController">
+<body ng-app="blockchainApp" ng-controller="blockchainController" class="p-5">
+    <h1>A Simple Blockchain</h1>
+    <ul>
+    	<li>Each block consists of a block number, nonce, message, hash of the previous block and hash of the block itself.</li>
+    	<li>Enter your message in the "Message" textbox in the block. Add more blocks with more messages.</li>
+    	<li>Mine all blocks to make it valid (the Mine button finds a nonce that solves the cryptographic puzzle).</li>
+    	<li>Try modifying the previous messages. You will notice this invalidates all blocks after it. Undoing the changes will validate all blocks again.</li>
+    	<li>The message can be anything, usually, its a transaction containing From, To and Amount fields</li>
+    </ul>
     <button class="btn btn-primary m-4" type="button" ng-click="addblock()">Add Block</button>
     <div class="row">
-        <div class="border border-dark col-md-3 p-3 m-3" ng-repeat="block in blocks" ng-class='{red: checkhash(findhash($index))==false, blue:checkhash(findhash($index))==true}' ng-cloak>
+        <div class="border border-dark col-md-6 col-lg-4 col-xl-3 p-3" ng-repeat="block in blocks" ng-class='{red: checkhash(findhash($index))==false, blue:checkhash(findhash($index))==true}' ng-cloak>
             <h4>Block {{$index}}</h4>
             <label>Nonce</label>
             <input class="form-control" type="number" ng-model="block.nonce">
